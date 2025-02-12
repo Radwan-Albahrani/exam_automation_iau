@@ -23,7 +23,7 @@ def get_exam_events(major: str, level: int, exam_table: DataFrame) -> list[Calen
         level_column = next(col for col in major_level_rows.columns if "level" in col.lower())
 
         level_string: str = row[level_column]
-        if len(level_string) > 1:
+        if len(level_string) > 2:
             # index of first digit that matches level
             level_index = level_string.find(str(level))
 
@@ -38,11 +38,12 @@ def get_exam_events(major: str, level: int, exam_table: DataFrame) -> list[Calen
 
         date_time = f"{row['Date']}"
         date_time_date = dt.datetime.strptime(date_time, "%A %d/%m/%Y")
-        date_time_start = row["Time"].split(" to ")[0]
-        date_time_end = row["Time"].split(" to ")[1]
+
+        # figure out if there are spaces around it
+        date_time_start = row["Time"].split("to")[0]
+        date_time_end = row["Time"].split("to")[1]
 
         # if there is a space between hours and minutes, remove it
-
         date_time_start = date_time_start.replace(" ", "")
         date_time_end = date_time_end.replace(" ", "")
 
@@ -62,6 +63,7 @@ def get_exam_events(major: str, level: int, exam_table: DataFrame) -> list[Calen
             end=EventDateTime(dateTime=dt_obj_end, timeZone="Asia/Riyadh"),
         )
         events.append(event)
+
     if len(events) == 0:
         print_error("No exams found")
         exit()
